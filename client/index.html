@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Sockets Practice</title>
+  </head>
+  <body>
+    <canvas id="ctx" width="500" height="500" style="border: 1px solid #000000;"></canvas>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script>
+      const ctx = document.getElementById("ctx").getContext("2d");
+      ctx.font = '30px Arial';
+
+      const socket = io();
+
+      socket.on('newPositions', function(data) {
+        ctx.clearRect(0,0,500,500);
+
+        for(let i = 0; i < data.length; i++) {
+          ctx.fillText(data[i].number, data[i].x, data[i].y);
+        }
+      });
+
+    </script>
+
+  </body>
+</html>

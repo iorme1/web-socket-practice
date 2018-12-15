@@ -9,3 +9,41 @@ app.get('/', (req, res) => {
 app.use('/client', express.static(__dirname + '/client'));
 
 serv.listen(2000);
+
+
+const io = require('socket.io')(serv, {});
+const SOCKET_LIST = {};
+
+
+io.sockets.on('connection', function(socket) {
+  socket.id = Math.random();
+  socket.x = 0;
+  socket.y = 0;
+  socket.number = "" + Math.floor(10 * Math.random());
+  SOCKET_LIST[socket.id] = socket;
+
+  socket.on('disconnect', function() {
+    delete SOCKET_LIST[socket.id];
+  })
+});
+
+setInterval(function() {
+  const pack = [];
+
+  for (let i in SOCKET_LIST) {
+    let socket = SOCKET_LIST[i];
+    socket.x++;
+    socket.y++;
+    pack.push({
+      x: socket.x,
+      y: socket.y,
+      number: socket.number
+    });
+  }
+
+  for (let i in SOCKET_LIST) {
+    let socket = SOCKET_LIST[i]
+    socket.emit('newPositions', pack);
+  }
+
+}, 1000/25);
